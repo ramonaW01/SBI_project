@@ -1,0 +1,91 @@
+RANKING OF PREDICTED BINDING SITES
+========================================
+
+Rank 1: Pocket 0 | Score: 3925 | Best for: Polar Ligands
+  Residues involved: ALA, ARG, ASN, ASP, CYS, GLN, GLU, GLY, HIS, ILE, LEU, LYS, MET, PHE, PRO, SER, THR, TRP, TYR, VAL
+  Polarity ratio:    0.65
+
+Rank 2: Pocket 10 | Score: 5 | Best for: Non-Polar Ligands
+  Residues involved: ALA, GLU, GLY, HIS, ILE, LEU, LYS, MET, PRO, SER
+  Polarity ratio:    0.48
+
+Rank 3: Pocket 19 | Score: 4 | Best for: Polar Ligands
+  Residues involved: ASN, GLU, LEU, LYS, PRO, SER
+  Polarity ratio:    0.75
+
+Rank 4: Pocket 12 | Score: 3 | Best for: Polar Ligands
+  Residues involved: GLN, LYS
+  Polarity ratio:    1.00
+
+Rank 5: Pocket 13 | Score: 3 | Best for: Non-Polar Ligands
+  Residues involved: ALA, ASP, CYS, GLY, PHE, SER, TRP, VAL
+  Polarity ratio:    0.35
+
+Rank 6: Pocket 4 | Score: 2 | Best for: Polar Ligands
+  Residues involved: ASP, TYR
+  Polarity ratio:    1.00
+
+Rank 7: Pocket 5 | Score: 2 | Best for: Polar Ligands
+  Residues involved: ARG
+  Polarity ratio:    1.00
+
+Rank 8: Pocket 7 | Score: 2 | Best for: Polar Ligands
+  Residues involved: LYS, PHE
+  Polarity ratio:    0.67
+
+Rank 9: Pocket 14 | Score: 2 | Best for: Polar Ligands
+  Residues involved: ARG
+  Polarity ratio:    1.00
+
+Rank 10: Pocket 1 | Score: 1 | Best for: Polar Ligands
+  Residues involved: ARG, ASN
+  Polarity ratio:    1.00
+
+Rank 11: Pocket 2 | Score: 1 | Best for: Polar Ligands
+  Residues involved: ASP
+  Polarity ratio:    1.00
+
+Rank 12: Pocket 3 | Score: 1 | Best for: Polar Ligands
+  Residues involved: ASP, THR
+  Polarity ratio:    1.00
+
+Rank 13: Pocket 6 | Score: 1 | Best for: Polar Ligands
+  Residues involved: GLU
+  Polarity ratio:    1.00
+
+Rank 14: Pocket 8 | Score: 1 | Best for: Polar Ligands
+  Residues involved: LEU, LYS
+  Polarity ratio:    0.50
+
+Rank 15: Pocket 9 | Score: 1 | Best for: Non-Polar Ligands
+  Residues involved: ILE, LEU
+  Polarity ratio:    0.00
+
+Rank 16: Pocket 11 | Score: 1 | Best for: Non-Polar Ligands
+  Residues involved: LEU
+  Polarity ratio:    0.00
+
+Rank 17: Pocket 15 | Score: 1 | Best for: Polar Ligands
+  Residues involved: LYS
+  Polarity ratio:    1.00
+
+Rank 18: Pocket 16 | Score: 1 | Best for: Polar Ligands
+  Residues involved: GLU
+  Polarity ratio:    1.00
+
+Rank 19: Pocket 17 | Score: 1 | Best for: Polar Ligands
+  Residues involved: ARG
+  Polarity ratio:    1.00
+
+Rank 20: Pocket 18 | Score: 1 | Best for: Polar Ligands
+  Residues involved: GLU
+  Polarity ratio:    1.00
+
+Rank 21: Pocket 20 | Score: 1 | Best for: Polar Ligands
+  Residues involved: ASP, GLU
+  Polarity ratio:    1.00
+
+Rank 22: Pocket 21 | Score: 1 | Best for: Polar Ligands
+  Residues involved: GLU, ILE, SER
+  Polarity ratio:    0.67
+
