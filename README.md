@@ -1,78 +1,103 @@
-# SBI_project
-SBI and PYT project
-Structure-Based Ligand Binding Site Predictor
+## SBI_project
 
-This project implements a geometric and density-based approach to predict potential ligand binding sites (pockets) on protein structures using PDB files.
-Overview
+# Pocket Finder
+**Structure-Based Ligand Binding Site Predictor**  
+*Final Project — Introduction to Python & Structural Bioinformatics (UPF)*
 
-The algorithm identifies cavities on a protein surface by generating a 3D grid around the structure and filtering points based on their proximity to protein atoms. Finally, it groups these points into distinct clusters representing individual binding pockets.
-Features
+---
 
-    Clean PDB Parsing: Automatically filters out water molecules and existing ligands to focus solely on the protein structure.
+## Overview
 
-    Efficient Spatial Search: Utilizes KD-Trees for fast distance calculations between grid points and atoms.
+Pocket Finder implements a geometry-based approach to predict potential ligand binding sites on protein structures. Given a protein in PDB format, the program identifies surface cavities that are geometrically and chemically suitable for small molecule binding — without requiring prior knowledge of known binding sites.
 
-    Density-Based Clustering: Uses the DBSCAN algorithm to automatically detect and separate multiple binding sites.
+The algorithm places a 3D grid around the protein, filters points by proximity to protein atoms, clusters the remaining candidates into discrete pockets, and characterizes each pocket chemically based on its lining residues.
 
-    Visualization Ready: Exports results as PDB files (HETATM records) for immediate analysis in Chimera, PyMOL, or other molecular graphics software.
+---
 
-Prerequisites
+## Features
 
-The following Python libraries are required:
+- **Clean PDB Parsing** — Automatically filters water molecules, ligands, ions, and co-factors using BioPython's `is_aa()` function
+- **Efficient Spatial Search** — KD-Trees for fast distance calculations between grid points and protein atoms
+- **Density-Based Clustering** — DBSCAN automatically detects and separates multiple binding sites without requiring a predefined pocket count
+- **Chemical Characterization** — Classifies each pocket as hydrophobic, polar, charged, or mixed based on lining residue composition
+- **Visualization Ready** — Exports results as PDB files (HETATM records) for direct use in Chimera or PyMOL
 
-    numpy
+---
 
-    biopython
+## Requirements
 
-    scipy
-
-    scikit-learn
-
-You can install them via pip:
-Bash
-
+```bash
 pip install numpy biopython scipy scikit-learn
+```
 
-How It Works
-1. Parsing (get_protein_structure)
+| Package | Purpose |
+|---|---|
+| `numpy` | Array operations and coordinate math |
+| `biopython` | PDB parsing and structure traversal |
+| `scipy` | KDTree for spatial queries |
+| `scikit-learn` | DBSCAN clustering |
 
-The script reads a .pdb file and extracts only the coordinates of standard amino acid residues. This ensures that the "empty" spaces found later are truly available for new ligands.
-2. Grid Generation (create_search_grid)
+---
 
-A 3D bounding box is created around the protein. A grid of points (default spacing 2.0Å for speed, 1.0Å for quality) is laid over the structure.
-3. Geometric Filtering (find_pocket_points)
+## Usage
 
-Each grid point is evaluated:
+1. Place your PDB file (e.g. `1H8D.pdb`) in the project directory
+2. Open `pocket_finder.ipynb` in Jupyter
+3. Run all cells, or call the pipeline directly:
 
-    Clash Filter: Points too close to any protein atom (< 2.5Å) are removed.
+```python
+structure, atoms = get_protein_structure("1H8D.pdb")
+final_rankings = run_full_prediction(atoms, spacing=1.0)
+```
 
-    Surface Filter: Points too far from the protein surface (> 5.0Å) are removed to avoid including the open solvent space.
+4. Optionally export PDB files for visualization:
 
-    Remaining points represent the "negative volume" of the protein's cavities.
+```python
+export_all_steps(atoms, output_dir="pocket_output")
+```
 
-4. Clustering (cluster_pocket_points)
+> Use `spacing=2.0` for fast testing, `spacing=1.0` for final predictions.
 
-Individual points are grouped into clusters using DBSCAN. This step separates the global "cloud" of points into distinct, numbered pockets.
-5. Export & Visualization (export_all_steps)
 
-The script generates several files to document the process:
 
-    step1_full_grid.pdb: The initial search box.
+## How It Works
 
-    step2_pocket_candidates.pdb: All points found in any surface indentation.
+| Step | Function | Description |
+|---|---|---|
+| 1 | `get_protein_structure` | Parse PDB, keep only standard amino acids |
+| 2 | `create_search_grid` | Generate 3D grid around the protein (default 1.0 Å spacing) |
+| 3 | `find_pocket_points` | Remove interior points (< 2.5 Å) and bulk solvent (> 5.0 Å) |
+| 4 | `cluster_pocket_points` | Group candidates into pockets via DBSCAN |
+| 5 | `get_pocket_residues` | Identify residues lining each pocket (threshold 4.5 Å) |
+| 6 | `analyze_and_rank_pockets` | Score and rank pockets by size and chemical composition |
 
-    step3_pocket_X.pdb: Individual files for each detected binding site.
+---
 
-Usage
+## Output
 
-    Place your target PDB file (e.g., 1H8D.pdb) in the project directory.
+**Console** — Ranked summary of the top 5 predicted binding sites including size, chemical nature, and key residues.
 
-    Run the script in a Jupyter Notebook or Python environment.
+**PDB files** (via `export_all_steps`):
+- `step1_full_grid.pdb` — Complete search grid
+- `step2_pocket_candidates.pdb` — Filtered surface candidates
+- `step3_pocket_0.pdb`, `step3_pocket_1.pdb`, … — Individual pocket clusters
 
-    Load the resulting .pdb files into UCSF Chimera:
+---
 
-        Use Actions -> Atoms/Bonds -> sphere to visualize the grid points as spheres.
+## Visualization
 
-Testing
+**UCSF Chimera:** `File → Open → step3_pocket_0.pdb` → `Actions → Atoms/Bonds → sphere`
 
-The script includes a test strategy that outputs the number of atoms found, the performance of the filtering step, and the total count of identified pockets.
+**PyMOL:**
+```
+load 1H8D.pdb, protein
+load step3_pocket_0.pdb, pocket1
+show spheres, pocket1
+color blue, pocket1
+```
+
+---
+
+## Documentation
+
+For a full description of the algorithm, parameters, and worked example, see the included **User Tutorial** (`pocket_finder_tutorial.docx`).

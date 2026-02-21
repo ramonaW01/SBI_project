@@ -1,69 +1,23 @@
 LIGAND BINDING SITE PREDICTIONS — RESIDUE LIST
-==================================================
-
-Pocket 0 (3925 points):
-Lining Residues: ALA-1, ALA-113, ALA-129, ALA-132, ALA-190, ALA-22, ARG-101, ARG-126, ARG-14, ARG-165, ARG-173, ARG-175, ARG-187, ARG-206, ARG-221, ARG-233, ARG-35, ARG-50, ARG-73, ARG-75, ARG-77, ARG-93, ARG-97, ASN-143, ASN-159, ASN-179, ASN-204, ASN-205, ASN-60, ASN-62, ASN-78, ASN-95, ASN-98, ASP-1, ASP-100, ASP-116, ASP-125, ASP-14, ASP-170, ASP-178, ASP-186, ASP-194, ASP-21, ASP-221, ASP-222, ASP-243, ASP-49, ASP-60, ASP-63, CYS-1, CYS-122, CYS-182, CYS-191, CYS-220, CYS-259, CYS-42, CYS-58, GLN-131, GLN-151, GLN-156, GLN-239, GLN-244, GLN-38, GLU-1, GLU-127, GLU-13, GLU-14, GLU-146, GLU-164, GLU-18, GLU-186, GLU-192, GLU-217, GLU-23, GLU-3, GLU-39, GLU-4, GLU-61, GLU-7, GLU-77, GLU-8, GLU-80, GLU-86, GLU-97, GLY-133, GLY-142, GLY-150, GLY-186, GLY-188, GLY-19, GLY-193, GLY-216, GLY-219, GLY-223, GLY-246, GLY-69, HIS-119, HIS-230, HIS-57, HIS-71, HIS-91, ILE-118, ILE-14, ILE-16, ILE-162, ILE-174, ILE-176, ILE-238, ILE-24, ILE-242, ILE-265, ILE-47, ILE-5, ILE-79, ILE-82, ILE-88, ILE-90, LEU-10, LEU-12, LEU-123, LEU-130, LEU-14, LEU-144, LEU-234, LEU-3, LEU-40, LEU-41, LEU-6, LEU-60, LEU-64, LEU-65, LEU-85, LEU-99, LYS-10, LYS-107, LYS-109, LYS-110, LYS-135, LYS-14, LYS-145, LYS-169, LYS-185, LYS-186, LYS-202, LYS-224, LYS-235, LYS-236, LYS-240, LYS-36, LYS-60, LYS-70, LYS-81, LYS-87, LYS-9, MET-26, MET-84, PHE-114, PHE-181, PHE-2, PHE-204, PHE-232, PHE-245, PHE-60, PHE-7, PRO-111, PRO-120, PRO-124, PRO-152, PRO-161, PRO-166, PRO-186, PRO-204, PRO-37, PRO-5, PRO-6, PRO-60, PRO-92, SER-11, SER-115, SER-129, SER-14, SER-153, SER-171, SER-195, SER-20, SER-203, SER-214, SER-262, SER-36, SER-48, SER-72, SER-83, THR-128, THR-14, THR-147, THR-172, THR-177, THR-60, THR-74, TRP-141, TRP-215, TRP-237, TRP-51, TRP-60, TRP-96, TYR-117, TYR-134, TYR-14, TYR-184, TYR-208, TYR-225, TYR-60, TYR-76, TYR-89, TYR-94, VAL-112, VAL-121, VAL-154, VAL-157, VAL-158, VAL-163, VAL-167, VAL-17, VAL-213, VAL-241, VAL-267
-----------------------------------------
-Pocket 10 (5 points):
-Lining Residues: ALA-22, GLU-23, GLY-25, HIS-71, ILE-24, LEU-155, LYS-70, MET-26, PRO-28, SER-261, SER-27
-----------------------------------------
-Pocket 19 (4 points):
-Lining Residues: ASN-205, GLU-14, LEU-14, LYS-202, PRO-204, SER-203
-----------------------------------------
-Pocket 12 (3 points):
-Lining Residues: GLN-244, LYS-240
-----------------------------------------
-Pocket 13 (3 points):
-Lining Residues: ALA-190, ASP-189, CYS-191, GLY-216, GLY-226, PHE-227, SER-195, SER-214, TRP-215, VAL-213
-----------------------------------------
-Pocket 4 (2 points):
-Lining Residues: ASP-116, TYR-117
-----------------------------------------
-Pocket 5 (2 points):
-Lining Residues: ARG-50
-----------------------------------------
-Pocket 7 (2 points):
-Lining Residues: LYS-107, PHE-245
-----------------------------------------
-Pocket 14 (2 points):
-Lining Residues: ARG-97
-----------------------------------------
-Pocket 1 (1 points):
-Lining Residues: ARG-77, ASN-78
-----------------------------------------
-Pocket 2 (1 points):
-Lining Residues: ASP-1
-----------------------------------------
-Pocket 3 (1 points):
-Lining Residues: ASP-63, THR-60
-----------------------------------------
-Pocket 6 (1 points):
-Lining Residues: GLU-86
-----------------------------------------
-Pocket 8 (1 points):
-Lining Residues: LEU-12, LYS-10
-----------------------------------------
-Pocket 9 (1 points):
-Lining Residues: ILE-24, LEU-6
-----------------------------------------
-Pocket 11 (1 points):
-Lining Residues: LEU-12
-----------------------------------------
-Pocket 15 (1 points):
-Lining Residues: LYS-240
-----------------------------------------
-Pocket 16 (1 points):
-Lining Residues: GLU-217
-----------------------------------------
-Pocket 17 (1 points):
-Lining Residues: ARG-97
-----------------------------------------
-Pocket 18 (1 points):
-Lining Residues: GLU-217
-----------------------------------------
-Pocket 20 (1 points):
-Lining Residues: ASP-186, GLU-186
-----------------------------------------
-Pocket 21 (1 points):
-Lining Residues: GLU-14, ILE-14, SER-14
-----------------------------------------
+Pocket 2 (38 points):
+Lining Residues: ARG-H101, ARG-H175, ASN-H179, ASN-H98, ASP-H100, ASP-H102, HIS-H230, ILE-H174, ILE-H176, LEU-H234, LEU-H99, MET-H180, PHE-H181, PHE-H227, SER-H214, THR-H177, THR-H229, TRP-H215, TYR-H228
+Pocket 4 (25 points):
+Lining Residues: ALA-H44, ASP-H194, CYS-H42, GLN-H30, GLY-H140, GLY-H142, GLY-H193, GLY-H196, GLY-H197, GLY-H43, LEU-H33, LEU-H40, MET-H32, PRO-H198, SER-H195, THR-H139, TRP-H141, VAL-H31
+Pocket 9 (14 points):
+Lining Residues: HIS-H230, HIS-H91, ILE-H103, ILE-H212, ILE-H238, LEU-H123, LEU-H234, LEU-H53, LYS-H235, PHE-H232, THR-H229, TRP-H237, VAL-H231
+Pocket 5 (8 points):
+Lining Residues: ARG-H35, GLN-H38, ILE-I5, LEU-H64, LEU-H65, LEU-I10, LYS-H36, PHE-H34
+Pocket 10 (7 points):
+Lining Residues: ALA-H129, GLN-H209, GLY-H211, HIS-H230, LEU-H130, MET-H210, PHE-H181, PHE-H232, PRO-H124, VAL-H231
+Pocket 13 (7 points):
+Lining Residues: ARG-L4, ASP-H116, GLY-H25, HIS-H119, ILE-H118, LEU-L6, PHE-L7, PRO-H28, PRO-L5, SER-H115, TYR-H117
+Pocket 3 (6 points):
+Lining Residues: ALA-H190, ASP-H194, GLY-H140, GLY-H197, ILE-H16, PRO-H198, THR-H139, VAL-H138, VAL-H213, VAL-H266
+Pocket 6 (6 points):
+Lining Residues: ALA-H183, ARG-H137, ASN-H159, GLY-H136, GLY-H184, LEU-H160, PHE-H199, TYR-H228, VAL-H138, VAL-H158
+Pocket 8 (6 points):
+Lining Residues: ALA-H44, ALA-H55, GLN-H209, GLY-H196, GLY-H197, ILE-H212, LEU-H53, PRO-H198, SER-H45, THR-H54
+Pocket 7 (5 points):
+Lining Residues: ARG-H67, ARG-H75, GLN-H38, GLU-I3, GLU-I4, ILE-I5, PHE-H34, PHE-I2, THR-H74, TYR-H76
+Pocket 11 (5 points):
+Lining Residues: LEU-H129, LYS-H202, MET-H201, PRO-H204, SER-H203, TYR-H134, TYR-L14
