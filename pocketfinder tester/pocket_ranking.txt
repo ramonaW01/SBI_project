@@ -1,122 +1,78 @@
 PROFESSIONAL BINDING SITE ANALYSIS
-Rank 1 | Pocket 2 | Score: 65
-Size: 38 grid points
-Preferred Ligand Type: Polar Ligands
+Rank 1 | Pocket 8 | Score: 31
+Size: 5 grid points
+Preferred Ligand Type: Hydrophobic Ligands
 Composition:
-  Hydrophobic: 5
-  Polar:       4
+  Hydrophobic: 9
+  Polar:       1
   Positive:    2
-  Negative:    1
+  Negative:    0
   Special:     0
 Residues:
-  ARG, ASN, ASP, HIS, ILE, LEU, MET, PHE, SER, THR, TRP, TYR
-Rank 2 | Pocket 4 | Score: 44
-Size: 25 grid points
+  ILE, ILE, ILE, LEU, LEU, LYS, LYS, MET, TRP, TYR, VAL, VAL
+Rank 2 | Pocket 3 | Score: 26
+Size: 4 grid points
 Preferred Ligand Type: Mixed Ligands
 Composition:
   Hydrophobic: 5
   Polar:       3
-  Positive:    0
-  Negative:    1
+  Positive:    2
+  Negative:    0
   Special:     3
 Residues:
-  ALA, ASP, CYS, GLN, GLY, LEU, MET, PRO, SER, THR, TRP, VAL
-Rank 3 | Pocket 9 | Score: 32
-Size: 14 grid points
-Preferred Ligand Type: Hydrophobic Ligands
-Composition:
-  Hydrophobic: 5
-  Polar:       1
-  Positive:    2
-  Negative:    0
-  Special:     0
-Residues:
-  HIS, ILE, LEU, LYS, PHE, THR, TRP, VAL
-Rank 4 | Pocket 13 | Score: 26
-Size: 7 grid points
-Preferred Ligand Type: Charged Ligands
-Composition:
-  Hydrophobic: 3
-  Polar:       2
-  Positive:    2
-  Negative:    1
-  Special:     2
-Residues:
-  ARG, ASP, GLY, HIS, ILE, LEU, PHE, PRO, SER, TYR
-Rank 5 | Pocket 5 | Score: 22
-Size: 8 grid points
-Preferred Ligand Type: Charged Ligands
-Composition:
-  Hydrophobic: 3
-  Polar:       1
-  Positive:    2
-  Negative:    0
-  Special:     0
-Residues:
-  ARG, GLN, ILE, LEU, LYS, PHE
-Rank 6 | Pocket 10 | Score: 22
-Size: 7 grid points
-Preferred Ligand Type: Hydrophobic Ligands
-Composition:
-  Hydrophobic: 5
-  Polar:       1
-  Positive:    1
-  Negative:    0
-  Special:     2
-Residues:
-  ALA, GLN, GLY, HIS, LEU, MET, PHE, PRO, VAL
-Rank 7 | Pocket 6 | Score: 21
+  ARG, GLN, GLY, GLY, HIS, ILE, LEU, LEU, PRO, SER, SER, TRP, VAL
+Rank 3 | Pocket 4 | Score: 23
 Size: 6 grid points
 Preferred Ligand Type: Mixed Ligands
 Composition:
-  Hydrophobic: 4
+  Hydrophobic: 5
   Polar:       2
   Positive:    1
   Negative:    0
-  Special:     1
+  Special:     2
 Residues:
-  ALA, ARG, ASN, GLY, LEU, PHE, TYR, VAL
-Rank 8 | Pocket 7 | Score: 21
+  ALA, ARG, ASN, GLY, GLY, LEU, PHE, TYR, VAL, VAL
+Rank 4 | Pocket 6 | Score: 21
 Size: 5 grid points
+Preferred Ligand Type: Mixed Ligands
+Composition:
+  Hydrophobic: 5
+  Polar:       3
+  Positive:    0
+  Negative:    0
+  Special:     4
+Residues:
+  ALA, ALA, GLN, GLY, GLY, GLY, ILE, LEU, PRO, SER, THR, VAL
+Rank 5 | Pocket 2 | Score: 19
+Size: 3 grid points
 Preferred Ligand Type: Charged Ligands
 Composition:
   Hydrophobic: 2
-  Polar:       3
+  Polar:       0
   Positive:    1
-  Negative:    1
-  Special:     0
-Residues:
-  ARG, GLN, GLU, ILE, PHE, THR, TYR
-Rank 9 | Pocket 8 | Score: 18
-Size: 6 grid points
-Preferred Ligand Type: Polar Ligands
-Composition:
-  Hydrophobic: 3
-  Polar:       3
-  Positive:    0
-  Negative:    0
+  Negative:    3
   Special:     2
 Residues:
-  ALA, GLN, GLY, ILE, LEU, PRO, SER, THR
-Rank 10 | Pocket 3 | Score: 17
-Size: 6 grid points
-Preferred Ligand Type: Mixed Ligands
+  ALA, ARG, ASP, ASP, CYS, GLU, GLY, VAL
+Rank 6 | Pocket 7 | Score: 19
+Size: 3 grid points
+Preferred Ligand Type: Hydrophobic Ligands
 Composition:
-  Hydrophobic: 3
+  Hydrophobic: 7
   Polar:       1
   Positive:    0
-  Negative:    1
-  Special:     2
+  Negative:    0
+  Special:     0
 Residues:
-  ALA, ASP, GLY, ILE, PRO, THR, VAL
-Rank 11 | Pocket 11 | Score: 16
-Size: 5 grid points
-Preferred Ligand Type: Polar Ligands
+  LEU, LEU, LEU, LEU, MET, SER, VAL, VAL
+Rank 7 | Pocket 5 | Score: 18
+Size: 3 grid points
+Preferred Ligand Type: Mixed Ligands
 Composition:
-  Hydrophobic: 2
-  Polar:       2
+  Hydrophobic: 5
+  Polar:       1
   Positive:    1
   Negative:    0
-  Special:     1
+  Special:     3
 Residues:
-  LEU, LYS, MET, PRO, SER, TYR
+  ARG, GLY, GLY, ILE, PHE, PRO, TYR, VAL, VAL, VAL
