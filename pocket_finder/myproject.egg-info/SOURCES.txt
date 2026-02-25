@@ -1,0 +1,11 @@
+README.md
+pyproject.toml
+myproject/__init__.py
+myproject/analysis.py
+myproject/data.py
+myproject/utils.py
+myproject.egg-info/PKG-INFO
+myproject.egg-info/SOURCES.txt
+myproject.egg-info/dependency_links.txt
+myproject.egg-info/requires.txt
+myproject.egg-info/top_level.txt

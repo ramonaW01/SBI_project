@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "myproject"
+version = "1.0"
+description = "Protein Binding Pocket Finder"
+authors = [{name="Cristina Torredemer & Ramona Walch", email="deine.email@uni.edu"}]
+dependencies = [
+    "biopython", 
+    "numpy", 
+    "pandas", 
+    "scipy", 
+    "scikit-learn"
+]

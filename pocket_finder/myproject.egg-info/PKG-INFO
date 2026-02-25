@@ -1,0 +1,10 @@
+Metadata-Version: 2.4
+Name: myproject
+Version: 1.0
+Summary: Protein Binding Pocket Finder
+Author-email: Cristina Torredemer & Ramona Walch <deine.email@uni.edu>
+Requires-Dist: biopython
+Requires-Dist: numpy
+Requires-Dist: pandas
+Requires-Dist: scipy
+Requires-Dist: scikit-learn
