@@ -1,0 +1,67 @@
+# Protein Binding Pocket Finder
+
+A command-line tool written in Python that identifies, scores, and visualizes potential ligand-binding pockets in protein structures. 
+
+Instead of relying on computationally expensive energy functions, this tool uses a geometry-based algorithm to sample the protein surface. It identifies cavities, clusters them into distinct pockets, and ranks them based on structural and biochemical properties.
+
+## Features
+
+* **Intelligent Structure Cleaning:** Automatically processes raw `.pdb` files. It removes water molecules, metal ions, chemical ligands, and actively detects and removes short peptide inhibitors (chains with fewer than 30 amino acids).
+* **Geometric Grid Sampling:** Generates a 3D grid around the protein and filters points based on distance thresholds (removing points that clash with protein atoms or are too far in empty space).
+* **DBSCAN Clustering:** Groups the remaining valid pocket points into distinct clusters using density-based spatial clustering.
+* **Master Scoring System:** Ranks identified pockets based on a combined score that evaluates pocket size, the hydrophobicity of neighboring amino acids, and evolutionary conservation scores.
+* **Visualization Ready:** Exports a modified `.pdb` file where the identified pockets are represented as dummy atoms, allowing for easy visualization in PyMOL or UCSF Chimera.
+
+## Project Structure
+
+The project is modularized for maintainability and easy extension:
+
+* `pocket_finder.py`: The main command-line interface (CLI) script.
+* `myproject/`: The core Python package containing the logic.
+  * `data.py`: Handles loading, cleaning, and exporting PDB files (powered by Biopython).
+  * `utils.py`: Contains constants (e.g., hydrophobicity scales) and the grid generation logic.
+  * `analysis.py`: Contains the core algorithms for filtering geometry, clustering, and scoring.
+
+## Installation
+
+This project is packaged using standard Python build tools (`pyproject.toml`). To install the tool and all required dependencies (Biopython, Pandas, Scikit-learn, SciPy, Numpy), navigate to the root directory of the project in your terminal and run:
+
+```bash
+pip install -e .
+
+Usage
+
+You can run the tool directly from your terminal. It requires a .pdb file as the main argument.
+
+Standard Analysis:
+Bash
+
+python pocket_finder.py <target_file.pdb>
+
+Targeting a Specific Chain:
+If you want to restrict the analysis to a specific protein chain (e.g., chain 'H'), you can pass the chain ID as an optional second argument:
+Bash
+
+python pocket_finder.py <target_file.pdb> H
+
+Output
+
+    Terminal Report: A ranked table (Pandas DataFrame) will be printed directly to your console, detailing the size, hydrophobicity score, and master score for each identified pocket.
+
+    Cleaned Protein File: <target_name>_cleaned.pdb (The protein structure with all water, ligands, and inhibitors removed).
+
+    Visualization File: <target_name>_with_pockets.pdb (The cleaned protein structure combined with the predicted pockets, ready to be opened in your preferred molecular viewer).
+
+Dependencies
+
+    Python >= 3.8
+
+    Biopython
+
+    NumPy
+
+    Pandas
+
+    SciPy
+
+    Scikit-Learn

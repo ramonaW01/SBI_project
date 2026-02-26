@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bio_pockets"
+version = "1.0"
+description = "A structural bioinformatics tool for protein binding pocket prediction using geometry and HMM-based conservation."
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [{name="Cristina Torredemer & Ramona Walch", email="cristina.torredemer01@estudiant.upf.edu"}]
+dependencies = [
+    "biopython", 
+    "numpy", 
+    "pandas", 
+    "scipy", 
+    "scikit-learn"
+]
+
+[tool.setuptools]
+py-modules = ["pocket_finder"]
+packages = ["bio_pockets"]
+
+[project.scripts]
+predict-pockets = "pocket_finder:main" # it can be used in the working folder only predict-pockets protein.pdb database
+
+# Project_Folder/
+#├── pyproject.toml
+#├── README.md             <-- Your Tutorial & Theory
+#├── pocket_finder.py      <-- Your main script
+#└── myproject/            <-- The folder with your modules
+#    ├── __init__.py
+#    ├── data.py
+#    ├── utils.py
+#    └── analysis.py
+
+# mamba create -n pocket_env python=3.9 hmmer -c bioconda -c conda-forge
+# mamba activate pocket_env
+# pip install .
+

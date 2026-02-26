@@ -1,0 +1,13 @@
+README.md
+pocket_finder.py
+pyproject.toml
+bio_pockets/__init__.py
+bio_pockets/analysis.py
+bio_pockets/data.py
+bio_pockets/utils.py
+bio_pockets.egg-info/PKG-INFO
+bio_pockets.egg-info/SOURCES.txt
+bio_pockets.egg-info/dependency_links.txt
+bio_pockets.egg-info/entry_points.txt
+bio_pockets.egg-info/requires.txt
+bio_pockets.egg-info/top_level.txt
