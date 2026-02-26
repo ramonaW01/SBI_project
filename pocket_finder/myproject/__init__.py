@@ -9,5 +9,6 @@ from .analysis import (
     extract_and_save_residues,
     calculate_conservation_scores,
     filter_pockets_by_conservation,
-    rank_pockets_master_score
+    rank_pockets_master_score,
+    save_pocket_ranking_to_file
 )

@@ -113,35 +113,106 @@ def filter_pockets_by_conservation(pockets_dict: dict, protein_atoms: list, cons
     return conserved_pockets
 
 def rank_pockets_master_score(pockets_dict, protein_atoms, threshold=4.5):
+    """
+    Analyzes pockets, calculates the master score, and returns a detailed 
+    list of dictionaries compatible with 'save_pocket_ranking_to_file'.
+    """
     atom_coords = np.array([atom.get_coord() for atom in protein_atoms])
     tree = KDTree(atom_coords)
     results = []
+    
+    # Define chemical groups for the detailed analysis output
+    HYDROPHOBIC = {'ALA', 'VAL', 'ILE', 'LEU', 'MET', 'PHE', 'TYR', 'TRP', 'PRO'}
+    POLAR = {'SER', 'THR', 'ASN', 'GLN', 'CYS'}
+    POSITIVE = {'ARG', 'LYS', 'HIS'}
+    NEGATIVE = {'ASP', 'GLU'}
     
     for p_id, points in pockets_dict.items():
         neighbor_indices = tree.query_ball_point(points, threshold)
         flat_indices = set(idx for sublist in neighbor_indices for idx in sublist)
         
+        # Get unique residues
         residues = set(protein_atoms[idx].get_parent() for idx in flat_indices)
-        hydro_scores = [KD_SCALE.get(res.get_resname(), 0.0) for res in residues]
-        avg_hydro = sum(hydro_scores) / len(hydro_scores) if hydro_scores else 0.0
         
+        hydro_scores = []
+        res_ids_for_output = []
+        comp_counts = {'hydrophobic': 0, 'polar': 0, 'positive': 0, 'negative': 0, 'special': 0}
+        
+        # Analyze each residue
+        for res in residues:
+            name = res.get_resname()
+            hydro_scores.append(KD_SCALE.get(name, 0.0))
+            res_ids_for_output.append(f"{name}{res.id[1]}") # e.g., 'ALA45'
+            
+            # Count chemical composition
+            if name in HYDROPHOBIC: comp_counts['hydrophobic'] += 1
+            elif name in POLAR: comp_counts['polar'] += 1
+            elif name in POSITIVE: comp_counts['positive'] += 1
+            elif name in NEGATIVE: comp_counts['negative'] += 1
+            else: comp_counts['special'] += 1
+            
+        # --- Calculate your new Master Score ---
+        avg_hydro = sum(hydro_scores) / len(hydro_scores) if hydro_scores else 0.0
         size = len(points)
+        
         size_score = min(40, max(0, (size - 50) / 250 * 40))
         hydro_points = min(40, max(0, (avg_hydro + 2.0) / 4.0 * 40))
         cons_points = 10  # Placeholder for conservation bonus
         
+        master_score = round(size_score + hydro_points + cons_points, 1)
+        
+        # --- Determine Ligand Preference ---
+        if comp_counts['hydrophobic'] > len(residues) * 0.5:
+            preference = "Hydrophobic/Lipophilic molecules"
+        elif comp_counts['positive'] > comp_counts['negative'] and comp_counts['positive'] > 2:
+            preference = "Negatively charged molecules (Acids)"
+        elif comp_counts['negative'] > comp_counts['positive'] and comp_counts['negative'] > 2:
+            preference = "Positively charged molecules (Bases)"
+        else:
+            preference = "Mixed/Polar molecules"
+            
+        # Store everything in the exact format the saving function needs
         results.append({
-            'Pocket_ID': p_id,
-            'Master_Score': round(size_score + hydro_points + cons_points, 1),
-            'Hydrophobicity (KD)': round(avg_hydro, 2),
-            'Size (Points)': size,
-            'Residues': len(residues)
+            'id': p_id,
+            'score': master_score,
+            'size': size,
+            'preference': preference,
+            'composition': comp_counts,
+            'residues': sorted(res_ids_for_output)
         })
             
-    df = pd.DataFrame(results)
-    if not df.empty:
-        df = df.sort_values(by='Master_Score', ascending=False).reset_index(drop=True)
-        df.index += 1
-        df.index.name = 'Rank'
+    # Sort the list by Master_Score (highest first)
+    ranked_results = sorted(results, key=lambda x: x['score'], reverse=True)
         
-    return df
+    return ranked_results
+
+
+def save_pocket_ranking_to_file(ranked_pockets, filename="pocket_ranking.txt"):
+    """
+    Saves the detailed pocket analysis to a text file.
+    """
+    print(f"\n WRITING POCKET RANKING TO {filename} -\n")
+
+    with open(filename, "w") as f:
+        f.write("BINDING SITE ANALYSIS\n")
+        f.write("====================================\n\n")
+
+        for i, p in enumerate(ranked_pockets):
+            text = (
+                f"Rank {i+1} | Pocket {p['id']} | Score: {p['score']}\n"
+                f"Size: {p['size']} grid points\n"
+                f"Preferred Ligand Type: {p['preference']}\n"
+                f"Composition:\n"
+                f"  Hydrophobic: {p['composition'].get('hydrophobic', 0)}\n"
+                f"  Polar:       {p['composition'].get('polar', 0)}\n"
+                f"  Positive:    {p['composition'].get('positive', 0)}\n"
+                f"  Negative:    {p['composition'].get('negative', 0)}\n"
+                f"  Special:     {p['composition'].get('special', 0)}\n"
+                f"Residues:\n"
+                f"  {', '.join(p['residues'])}\n"
+            )
+            
+            # Write to the actual text file
+            f.write(text)
+
+    print(f"Successfully saved ranking to '{filename}'")

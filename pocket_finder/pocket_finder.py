@@ -37,24 +37,31 @@ def main():
     
     # 5. Score & Export
     print("Calculating Master Scores...\n")
-    ranking_df = myproject.rank_pockets_master_score(all_pockets, clean_atoms)
+    # This now returns a LIST of dictionaries
+    ranking_data = myproject.rank_pockets_master_score(all_pockets, clean_atoms)
 
-    # Output as a nicely formatted text table directly in the terminal
+    # Output directly in the terminal
     print("RESULTS")
+    print(f"{'Rank':<5} | {'Pocket ID':<10} | {'Score':<8} | {'Size':<6} | {'Preference'}")
     print("-" * 75)
-    if not ranking_df.empty:
-        # to_string() prints a Pandas DataFrame cleanly in the terminal
-        print(ranking_df.to_string())
+    
+    # FIX: Check if list is not empty
+    if ranking_data:
+        # Loop through the list to print a clean table
+        for i, p in enumerate(ranking_data):
+            print(f"{i+1:<5} | {p['id']:<10} | {p['score']:<8} | {p['size']:<6} | {p['preference']}")
     else:
         print("No pockets found.")
     print("-" * 75)
 
-    # Save results
+    # 6. Save results
+    # Save the PDB file for Chimera/PyMOL
     myproject.save_protein_with_colored_pockets(clean_atoms, all_pockets, output_file)
-    print(f"\nDone! Results were saved as '{output_file}'.\n")
-
+    
+    # FIX: Save the detailed text ranking report
+    myproject.save_pocket_ranking_to_file(ranking_data, "pocket_ranking.txt")
+    
+    print(f"\nDone! Results were saved as '{output_file}' and 'pocket_ranking.txt'.\n")
 
 if __name__ == "__main__":
     main()
-    
-    
