@@ -88,21 +88,38 @@ def main():
             # Print only the essential data to the terminal
             print(f"{i+1:<5} | {p['id']:<10} | {p['score']:<8}")
         
-        # --- THE EXPORTS STILL CONTAIN EVERYTHING ---
-        # This function still writes the full details (Preference/Residues) to the text file
+        # 1. Export detailed report
         bio_pockets.save_pocket_ranking_to_file(ranking_data, ranking_report)
         
-        # This still saves the colored chains for PyMOL/Chimera
-        bio_pockets.save_protein_with_colored_pockets(clean_atoms, clustered_pockets, output_pdb)
+        # 2. Sort the pockets as ranking
+        sorted_all_pockets = {p['id']: clustered_pockets[p['id']] for p in ranking_data}
 
-        print("-"*40)
-        print(f"\n[SUMMARY] Analysis finalized.")
+        # 3. Save protein with colored pockets AND capture residue mapping
+        residue_to_chain = bio_pockets.save_protein_with_colored_pockets(
+            clean_atoms,              # <-- use cleaned atoms
+            sorted_all_pockets,       # <-- use sorted pockets
+            output_pdb
+        )
+
+        # 4. Generate visualization scripts using exact residue assignments
+        pymol_cmd, chimera_cmd = bio_pockets.generate_visualization_scripts(
+            base_name,
+            output_pdb,
+            residue_to_chain          # <-- REQUIRED third argument
+        )
+        
+        # 5. Automatically open Chimera
+        bio_pockets.open_in_chimera(chimera_cmd)
+
+        # SUMMARY
+        print(f"\nSUMMARY \nAnalysis finalized.")
         print(f"  > Structural Visualization: {output_pdb}")
         print(f"  > Detailed Technical Report: {ranking_report}")
+        print(f"\n  To visualize the results, run one of the following commands:")
+        print(f"    PyMOL  : pymol {pymol_cmd}")
+        print(f"    Chimera: chimera {chimera_cmd}")
     else:
         print("No significant pockets detected.")
-    
-    print("="*40 + "\n")
 
 if __name__ == "__main__":
     main()

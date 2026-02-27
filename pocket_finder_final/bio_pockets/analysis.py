@@ -21,8 +21,10 @@ print("IMPORTING ANALYSIS...")
 # =================================================================
 
 def find_pocket_points(grid_points: np.ndarray, protein_atoms: list, 
-                       min_dist=2.0, max_dist=5.0, surface_threshold=6.5, 
-                       min_neighbors=25, max_neighbors=50) -> np.ndarray:
+                       min_dist=2.0, max_dist=4.0, surface_threshold=6.5, 
+                       min_neighbors=30, max_neighbors=80,
+                       enclosure_radii=(4.0, 6.0, 8.0),  # NEW: Enclosure check
+                       min_enclosure=0.4) -> np.ndarray:
     """
     Identifies empty 3D space near the protein surface with high curvature.
     """
@@ -31,35 +33,91 @@ def find_pocket_points(grid_points: np.ndarray, protein_atoms: list,
     atom_coords = np.array([atom.get_coord() for atom in protein_atoms])
     tree = KDTree(atom_coords)
     
-    # Clash and Surface checks
+    # --- Step 1: Clash check (no atoms too close) ---
     clash_neighbors = tree.query_ball_point(grid_points, min_dist)
     candidates = grid_points[np.array([len(n) == 0 for n in clash_neighbors])]
     
+    print(f"  [DEBUG] After clash check:   {len(candidates)} candidates")
+    
+    # --- Step 2: Surface proximity (must be near protein) ---
     surface_neighbors = tree.query_ball_point(candidates, max_dist)
     candidates = candidates[np.array([len(n) > 0 for n in surface_neighbors])]
     
-    # Density check to isolate deep clefts vs flat surfaces
-    surface_access = tree.query_ball_point(candidates, surface_threshold)
-    pocket_points = candidates[np.array([min_neighbors <= len(n) <= max_neighbors for n in surface_access])]
+    print(f"  [DEBUG] After surface check: {len(candidates)} candidates")
     
+    # --- Step 3: Density check (deep cleft vs flat surface) ---
+    surface_access = tree.query_ball_point(candidates, surface_threshold)
+    candidates = candidates[np.array([min_neighbors <= len(n) <= max_neighbors for n in surface_access])]
+    
+    print(f"  [DEBUG] After density check: {len(candidates)} candidates")
+    
+    # --- Step 4: NEW - Enclosure check (true pocket vs flat surface) ---
+    # Check if the point is surrounded by atoms from multiple directions
+    # 26 directions = all combinations of -1, 0, +1 in 3D (cube neighbors)
+    directions = np.array([
+        [dx, dy, dz]
+        for dx in [-1, 0, 1]
+        for dy in [-1, 0, 1]
+        for dz in [-1, 0, 1]
+        if not (dx == 0 and dy == 0 and dz == 0)  # Exclude the center point
+    ], dtype=float)
+    
+    # Normalize to unit vectors
+    directions /= np.linalg.norm(directions, axis=1, keepdims=True)
+    
+    enclosed_mask = []
+    enclosure_scores = []
+
+    for point in candidates:
+        directions_with_atoms = 0
+        for direction in directions:
+            for radius in enclosure_radii:
+                probe = point + direction * radius
+                neighbors = tree.query_ball_point(probe, 2.0)
+                if len(neighbors) > 0:
+                    directions_with_atoms += 1
+                    break # This direction is covered, check the next one
+        
+        # At least min_enclosure% of the directions must have atoms
+        enclosure_score = directions_with_atoms / len(directions)
+        enclosure_scores.append(enclosure_score)
+        enclosed_mask.append(enclosure_score >= min_enclosure)
+    
+    if enclosure_scores:
+        print(f"  [DEBUG] Enclosure scores - min: {min(enclosure_scores):.2f}, max: {max(enclosure_scores):.2f}, mean: {np.mean(enclosure_scores):.2f}")
+    print(f"  [DEBUG] After enclosure check: {sum(enclosed_mask)} candidates")
+    
+    pocket_points = candidates[np.array(enclosed_mask)]
     return pocket_points
+   
 
 def cluster_pocket_points(pocket_points: np.ndarray, eps=1.5, min_samples=15, 
                           min_points=100, max_points=1000) -> dict:
-    """Groups detected points into discrete pockets and filters by size."""
-    if len(pocket_points) == 0: return {}
-    
+    """
+    Groups detected points into discrete pockets.
+    """
+    if len(pocket_points) == 0:
+        return {}
+
+    # --- Step 1: DBSCAN initial clustering ---
     db = DBSCAN(eps=eps, min_samples=min_samples)
     labels = db.fit_predict(pocket_points)
-    
+
     unique_labels = [lbl for lbl in set(labels) if lbl != -1]
     raw_pockets = {lbl: pocket_points[labels == lbl] for lbl in unique_labels}
-    
-    # Size filtering and re-indexing (The Unified Logic)
-    filtered = [pts for pts in raw_pockets.values() if min_points <= len(pts) <= max_points]
+
+    # --- Step 2: Size filtering ---
+    filtered = [pts for pts in raw_pockets.values()
+                if min_points <= len(pts) <= max_points]
+
     sorted_pockets = sorted(filtered, key=len, reverse=True)
-    
+
+    if not sorted_pockets:
+        return {}
+
+    # --- FINAL RETURN (no exclusive reassignment) ---
     return {i + 1: pts for i, pts in enumerate(sorted_pockets)}
+
 
 # =================================================================
 # 2. EVOLUTIONARY CONSERVATION (JACKHMMER)
@@ -122,7 +180,7 @@ def rank_pockets_master_score(pockets_dict: dict, protein_atoms: list, conservat
         avg_hydro = np.mean([KD_SCALE.get(r.get_resname(), 0.0) for r in residues]) if residues else 0.0
         avg_cons = np.mean([conservation_dict.get(f"{r.get_parent().id}_{r.id[1]}", 0.0) for r in residues]) if conservation_dict and residues else 0.0
         
-        # Composition and Ligand Preference (Classmate's logic)
+        # Composition and Ligand Preference
         comp = {'hydrophobic': 0, 'polar': 0, 'positive': 0, 'negative': 0, 'special': 0}
         res_strings = []
         for r in residues:

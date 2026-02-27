@@ -20,7 +20,9 @@ from .data import (
     save_clean_protein, # Remove water/ligands for analysis
     save_points_to_pdb, # Export pocket coordinates
     save_protein_with_colored_pockets, # Generate B-factor mapped PDBs
-    extract_sequence_from_pdb # Convert PDB coordinates to FASTA
+    extract_sequence_from_pdb, # Convert PDB coordinates to FASTA
+    generate_visualization_scripts,
+    open_in_chimera
 )
 
 # --- Geometry and Grid Utilities ---
