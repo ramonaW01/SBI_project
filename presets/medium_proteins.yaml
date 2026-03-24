@@ -1,0 +1,97 @@
+
+# PRESET: Medium Proteins
+
+# Target proteins: Standard-sized proteins, intermediate complexity
+# Protein size: 300-600 amino acids
+# Binding pocket size: 150-800 grid points
+#
+# Strategy: BALANCED = Middle ground between strict and permissive
+# - Moderate grid spacing (good speed/precision balance)
+# - Medium clustering parameters
+# - Not too strict, not too loose
+
+grid:
+  spacing_angstrom: 1.05
+  buffer_angstrom: 5.0
+
+geometry:
+  min_distance_angstrom: 2.0
+  max_distance_angstrom: 4.0
+  # Middle-ground surface proximity
+  
+  surface_threshold_angstrom: 6.5
+  # Standard threshold
+  
+  min_neighbors: 30
+  # Balanced minimum
+  
+  max_neighbors: 85
+  # Balanced maximum
+  
+  enclosure_check:
+    enabled: true
+    radii_angstrom: [4.0, 6.0, 8.0]
+    min_enclosure_fraction: 0.40
+    # Moderate enclosure requirement
+
+clustering:
+  eps_angstrom: 1.5
+  # Standard DBSCAN epsilon
+  
+  min_samples: 15
+  # Moderate minimum
+  
+  min_points: 100
+  # Medium minimum size
+  
+  max_points: 800
+  # **FOR MEDIUM PROTEINS**: max_points = 800
+  # Balance between small and large pockets
+
+conservation:
+  enabled: true
+  jackhmmer_cpus: 3
+  default_database: "/mnt/NFS_UPF/soft/databases/blastdat/uniprot_sprot.fasta"
+
+master_score:
+  weight_volume: 0.32
+  # 32%: Balanced weight
+  
+  weight_hydrophobicity: 0.34
+  weight_conservation: 0.34
+  
+  volume:
+    min_points: 75
+    max_points: 700
+    # Normalized for medium pocket sizes
+  
+  hydrophobicity:
+    min_value: -2.0
+    max_value: 2.0
+  
+  conservation:
+    min_value: 0.0
+    max_value: 1.0
+
+chemical_groups:
+  hydrophobic: ['ALA', 'VAL', 'ILE', 'LEU', 'MET', 'PHE', 'TYR', 'TRP', 'PRO']
+  polar: ['SER', 'THR', 'ASN', 'GLN', 'CYS']
+  positive: ['ARG', 'LYS', 'HIS']
+  negative: ['ASP', 'GLU']
+  
+  preference:
+    lipophilic_threshold: 0.48
+    cationic_threshold: 0.38
+
+residue_assignment:
+  distance_threshold_angstrom: 6.0
+  # Standard residue assignment
+
+logging:
+  level: "INFO"
+  format: "[%(levelname)s] %(message)s"
+  file: null
+
+visualization:
+  pymol_distance_threshold: 3.5
+  chimera_z_threshold: 3.5

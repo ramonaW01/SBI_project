@@ -1,0 +1,97 @@
+
+# PRESET: Small Enzymes
+
+# Target proteins: Thrombin, Chymotrypsin, Trypsin, Small Kinases
+# Protein size: 150-400 amino acids
+# Binding pocket size: 100-400 grid points
+#
+# Strategy: STRICT = Only high-confidence pockets
+# - Small min_neighbors (tighter control)
+# - Lower max_points (no merging)
+# - Moderate grid spacing (balance precision vs speed)
+
+grid:
+  spacing_angstrom: 1.0
+  buffer_angstrom: 5.0
+
+geometry:
+  min_distance_angstrom: 2.0
+  max_distance_angstrom: 3.8
+  # Tighter surface proximity for precise detection
+  
+  surface_threshold_angstrom: 6.0
+  # Slightly smaller radius - enzyme pockets are defined
+  
+  min_neighbors: 25
+  # Lower threshold to detect smaller pockets
+  
+  max_neighbors: 70
+  # Lower upper limit to avoid merging separate pockets
+  
+  enclosure_check:
+    enabled: true
+    radii_angstrom: [3.5, 5.5, 7.5]
+    min_enclosure_fraction: 0.45
+    # Slightly stricter - enzyme pockets are usually well-defined
+
+clustering:
+  eps_angstrom: 1.3
+  # Tighter clustering for discrete pockets
+  
+  min_samples: 12
+  # Lower minimum for small pockets
+  
+  min_points: 50
+  # Can detect smaller pockets
+  
+  max_points: 400
+  # **CRITICAL FOR SMALL ENZYMES**: max_points = 400
+  # Prevents large, merged pockets that don't exist in small proteins
+
+conservation:
+  enabled: true
+  jackhmmer_cpus: 2
+  default_database: "/mnt/NFS_UPF/soft/databases/blastdat/uniprot_sprot.fasta"
+
+master_score:
+  weight_volume: 0.35
+  # 35%: Size is important for small enzymes
+  
+  weight_hydrophobicity: 0.33
+  weight_conservation: 0.32
+  
+  volume:
+    min_points: 30
+    max_points: 350
+    # Normalized for small pocket sizes
+  
+  hydrophobicity:
+    min_value: -2.0
+    max_value: 2.0
+  
+  conservation:
+    min_value: 0.0
+    max_value: 1.0
+
+chemical_groups:
+  hydrophobic: ['ALA', 'VAL', 'ILE', 'LEU', 'MET', 'PHE', 'TYR', 'TRP', 'PRO']
+  polar: ['SER', 'THR', 'ASN', 'GLN', 'CYS']
+  positive: ['ARG', 'LYS', 'HIS']
+  negative: ['ASP', 'GLU']
+  
+  preference:
+    lipophilic_threshold: 0.50
+    cationic_threshold: 0.40
+
+residue_assignment:
+  distance_threshold_angstrom: 5.0
+  # Smaller radius - only closest residues matter
+
+logging:
+  level: "INFO"
+  format: "[%(levelname)s] %(message)s"
+  file: null
+
+visualization:
+  pymol_distance_threshold: 3.5
+  chimera_z_threshold: 3.5

@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bio_pockets"
+version = "1.0"
+description = "A structural bioinformatics tool for protein binding pocket prediction using geometry and HMM-based conservation."
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [{name="Cristina Torredemer & Ramona Walch", email="your.email@uni.edu"}]
+dependencies = [
+    "numpy>=1.20.0",        # For coordinate math and arrays
+    "pandas>=1.3.0",       # For CSV generation and dataframes
+    "biopython>=1.79",     # For PDB parsing and sequence handling
+    "scikit-learn>=1.0.0", # For DBSCAN clustering in analysis.py
+    "scipy>=1.7.0",        # For KDTree and spatial calculations
+    "pyyaml>=6.0",         # For loading the preset .yaml files
+]
+
+[project.scripts]
+# This creates a magic command 'predict_pockets' that runs your main script
+predict_pockets = "pocket_finder:main"
+
+# Project_Folder/
+#├── pyproject.toml
+#├── README.md             <-- Your Tutorial & Theory
+#├── pocket_finder.py      <-- Your main script
+#└── myproject/            <-- The folder with your modules
+#    ├── __init__.py
+#    ├── data.py
+#    ├── utils.py
+#    ├── config_manager.py
+#    ├── consensus_analyzer.py
+#    └── analysis.py
+
+
+# For this .toml file to work, ensure your files are organized like this:
+
+    #Top Level: pyproject.toml, README.md, pocket_finder.py.
+
+    #Subfolder myproject/: __init__.py, data.py, utils.py, config_manager.py, consensus_analyzer.py, analysis.py.
+
+[tool.setuptools.packages.find]
+include = ["bio_pockets*"] # it tells setuptools to only look inside bio_pockets/ and ignore presets/
+
+[tool.setuptools]
+py-modules = ["pocket_finder"] # This tells setuptools to include pocket_finder.py as a standalone module

@@ -1,0 +1,186 @@
+ # PocketFinder Configuration System
+ 
+# This file defines all parameters that control pocket detection.
+# Override these in preset YAML files for specific protein types.
+#
+# Typical Protein Type Sizes:
+# - Small Enzymes (Thrombin, Chymotrypsin): 200-300 aa, pockets 100-300 pts
+# - Medium Proteins (Kinases): 300-500 aa, pockets 200-800 pts
+# - Large Proteins (Kinase dimers, Complexes): 500-2000 aa, pockets 300-2000 pts
+
+
+ # SECTION 1: GRID GENERATION
+
+grid:
+  spacing_angstrom: 1.0
+  buffer_angstrom: 5.0
+  # spacing: Finer grids (0.5-0.8) = slower but more precise
+  #          Coarser grids (1.2-1.5) = faster but less accurate
+  # buffer: Distance around protein bounding box to include surface cavities
+
+ # SECTION 2: GEOMETRIC POCKET DETECTION
+
+geometry:
+  # Clash Check: No atoms within this distance  
+  min_distance_angstrom: 2.0
+  # Typical: 2.0 (strict, excludes crowded areas)
+  # For flexible regions: 1.5-1.8
+
+  # Surface Proximity: Grid point must be near protein  
+  max_distance_angstrom: 4.0
+  # Typical: 3.5-4.0 (includes protein surface points)
+  # Smaller = only very close surface points
+  # Larger = includes slightly distant points (can include noise)
+
+  # Density Check: Neighborhood must have enough atoms  
+  surface_threshold_angstrom: 6.5
+  # This is the radius around the grid point to count neighboring atoms
+  # Typical: 6.0-7.0
+  # Larger threshold = detects deeper pockets
+  
+  min_neighbors: 30
+  max_neighbors: 80
+  # min_neighbors: Minimum atoms in the radius (rejects isolated points)
+  #               Typical: 20-40
+  #               Smaller = detects smaller pockets
+  # max_neighbors: Maximum atoms (rejects crowded regions)
+  #               Typical: 60-100
+  #               Larger = allows bigger, more crowded areas
+
+  #  Enclosure Check: Point surrounded by atoms in multiple directions 
+  enclosure_check:
+    enabled: true
+    radii_angstrom: [4.0, 6.0, 8.0]
+    # Check at multiple radii for atom presence
+    min_enclosure_fraction: 0.4
+    # Minimum percentage of 26 directions that must have atoms
+    # 0.3 = loose (allow shallower pockets)
+    # 0.5 = strict (only true buried pockets)
+
+
+# SECTION 3: DBSCAN CLUSTERING
+
+clustering:
+  # DBSCAN parameters for grouping detected points
+  eps_angstrom: 1.5
+  # Distance threshold for neighbors
+  # Typical: 1.2-1.8
+  # Smaller eps = more, smaller clusters
+  # Larger eps = fewer, larger clusters (more merging)
+  
+  min_samples: 15
+  # Minimum points needed for a cluster to be valid
+  # Typical: 10-20
+  # Smaller = more small pockets detected
+  # Larger = only large, dense pockets
+  
+  # --- Size Filtering (after clustering) ---
+  min_points: 100
+  # Absolute minimum size (in grid points)
+  # Typical: 50-150
+  # Smaller = detects tiny pockets (may be noise)
+  # Larger = only bigger pockets
+  
+  max_points: 1000
+  # Absolute maximum size (in grid points)
+  # Typical: 500-2000
+  # Too small = loses large pockets in big proteins
+  # Too large = includes merged/artificial pockets
+
+
+# SECTION 4: CONSERVATION ANALYSIS (Jackhmmer)
+
+conservation:
+  enabled: true
+  # Set to false to skip MSA analysis (faster, less accurate)
+  
+  jackhmmer_cpus: 2
+  # Number of CPUs for Jackhmmer search
+  # Typical: 1-4 (balance speed vs system load)
+  
+  default_database: "/mnt/NFS_UPF/soft/databases/blastdat/uniprot_sprot.fasta"
+  # If no database provided, use this
+  # Can be: uniprot_sprot.fasta, nr.fasta, custom.fasta
+
+
+# SECTION 5: MASTER SCORE CALCULATION
+
+master_score:
+  # Master Score = weighted combination of three signals
+  # Result: 0-100 scale
+  
+  #  Weight Distribution 
+  weight_volume: 0.30
+  # 30%: Larger pockets score higher
+  # Biological: Bigger = more ligand binding potential
+  
+  weight_hydrophobicity: 0.35
+  # 35%: Hydrophobic character matters
+  # Biological: Ligands are often hydrophobic
+  
+  weight_conservation: 0.35
+  # 35%: Evolutionarily conserved = functional
+  # Biological: Natural selection protects important pockets
+  
+  # Normalization Ranges (for each component) 
+  volume:
+    min_points: 50
+    max_points: 500
+    # Points below min get 0, above max get 100
+  
+  hydrophobicity:
+    # Kyte-Doolittle scale: -4.5 to +4.5
+    min_value: -2.0
+    max_value: 2.0
+  
+  conservation:
+    # MSA alignment frequency: 0.0 to 1.0
+    min_value: 0.0
+    max_value: 1.0
+
+# SECTION 6: CHEMICAL PROFILING
+
+chemical_groups:
+  # Residue classifications for pocket characterization
+  hydrophobic: ['ALA', 'VAL', 'ILE', 'LEU', 'MET', 'PHE', 'TYR', 'TRP', 'PRO']
+  polar: ['SER', 'THR', 'ASN', 'GLN', 'CYS']
+  positive: ['ARG', 'LYS', 'HIS']
+  negative: ['ASP', 'GLU']
+  
+  # Pocket Preference Logic
+  preference:
+    lipophilic_threshold: 0.50
+    # If hydrophobic residues > 50% of pocket = Lipophilic
+    
+    cationic_threshold: 0.40
+    # If positive > negative by this margin = Anionic preference
+    # (positive residues attract negative ligands)
+
+
+# SECTION 7: RESIDUE ASSIGNMENT
+
+residue_assignment:
+  distance_threshold_angstrom: 6.0
+  # Distance from pocket points to CA atom for residue assignment
+  # Larger = assigns more residues
+  # Smaller = only closest residues
+
+
+# SECTION 8: LOGGING & OUTPUT
+
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  # DEBUG = very detailed, every step
+  # INFO = normal operation messages
+  # WARNING = only problems
+  # ERROR = only serious errors
+  
+  format: "[%(levelname)s] %(message)s"
+  file: null  # Set to "analysis.log" to save to file
+
+visualization:
+  pymol_distance_threshold: 3.5
+  # Distance from pocket grid points to color residues in PyMOL
+  
+  chimera_z_threshold: 3.5
+  # Distance from pocket grid points in Chimera visualization

@@ -1,0 +1,505 @@
+# PocketFinder Tutorial: Step-by-Step Guide
+
+**How to use PocketFinder to detect binding pockets in protein structures**
+
+---
+
+## Introduction
+
+This tutorial will guide you through using PocketFinder to analyze protein structures and predict ligand-binding sites. We'll use Thrombin (PDB ID: 1H8D) as an example throughout.
+
+PocketFinder detects binding pockets by:
+1. Scanning 3D space around the protein using three different geometric models
+2. Finding cavities that are likely to bind ligands
+3. Scoring pockets based on size, hydrophobicity, and evolutionary conservation
+4. Providing a ranked list with visualization
+
+---
+
+## Part 1: Installation (5 minutes)
+
+### Step 1: Install Required Software
+
+First, install PyYAML which is needed for the preset configuration system:
+
+```bash
+pip install pyyaml
+```
+
+### Step 2: Install HMMER (Optional but Recommended)
+
+For conservation scoring, you need HMMER:
+
+```bash
+conda install -c bioconda hmmer
+```
+
+Or if you're using apt:
+
+```bash
+sudo apt-get install hmmer
+```
+
+### Step 3: Install UCSF Chimera (Optional but Recommended)
+
+For 3D visualization of results:
+
+```bash
+conda install -c bioconda chimera
+```
+
+Or download manually from: https://www.cgl.ucsf.edu/chimera/download.html
+
+### Step 4: Install PocketFinder
+
+Navigate to the project directory and install:
+
+```bash
+cd pocket_finder_final_überarbeitet
+pip install -e .
+```
+
+Verify the installation worked:
+
+```bash
+python3 -c "import bio_pockets; import yaml; print('✓ Installation successful')"
+```
+
+If you see "✓ Installation successful", you're ready to go!
+
+---
+
+## Part 2: Basic Usage (10 minutes)
+
+### Getting a Test Protein
+
+Let's download Thrombin (1H8D) from the RCSB Protein Data Bank:
+
+```bash
+wget https://files.rcsb.org/download/1H8D.pdb
+```
+
+Or if wget is not available:
+
+```bash
+curl -O https://files.rcsb.org/download/1H8D.pdb
+```
+
+### Running PocketFinder
+
+Now analyze the protein. It's very simple - just one command:
+
+```bash
+python3 pocket_finder.py 1H8D.pdb
+```
+
+That's it! The program will:
+- Run all 3 preset analyses (small_enzymes, medium_proteins, large_proteins)
+- Detect pockets using each preset
+- Merge results (if pockets are < 3 Å apart, they're considered the same)
+- Generate output files
+- Open Chimera automatically (if installed)
+
+**Expected runtime:** 30-60 seconds depending on your computer
+
+### What Happens During Execution
+
+You'll see output like this:
+
+```
+======================================================================
+POCKETFINDER - UNIFIED ANALYSIS
+======================================================================
+Input:    1H8D.pdb
+Database: uniprot_sprot.fasta
+
+────────────────────────────────────────────────────────
+RUNNING: SMALL_ENZYMES
+────────────────────────────────────────────────────────
+[1/4] Preprocessing structure...
+      → 2030 atoms cleaned
+[2/4] Generating MSA...
+      ⚠️  Database not found, skipping conservation
+[3/4] Scanning for pockets...
+      → Found 7 pockets
+[4/4] Ranking pockets...
+      → Ranked 7 pockets
+
+────────────────────────────────────────────────────────
+RUNNING: MEDIUM_PROTEINS
+────────────────────────────────────────────────────────
+...
+```
+
+The program runs through each preset (small_enzymes, medium_proteins, large_proteins), detects pockets, and then combines the results.
+
+---
+
+## Part 3: Understanding the Output Files (15 minutes)
+
+After running, you'll have 4 main output files:
+
+### 1. 1H8D_ranking.txt - The Main Results
+
+This is the most important file. Open it:
+
+```bash
+cat 1H8D_ranking.txt
+```
+
+You'll see something like:
+
+```
+================================================================================
+POCKET FINDER: FINAL BINDING SITE RANKING
+================================================================================
+
+RANK 1 (***) | POCKET 1  | MASTER SCORE: 21.3
+────────────────────────────────────────────────────────────────────────────
+Volume (size):      572 grid points
+Chemical Profile:   Mixed/Polar
+Expected Ligands:   Diverse ligands with mixed character: antibiotics, 
+                    cofactors, nucleotides, peptides, polar pharmaceuticals
+Nearby Residues:    ALA183, ARG173, ASP186, ASP189, ... (44 total)
+Composition:        11 hydrophobic, 9 polar, 8 positive, 9 negative
+
+RANK 2 (***) | POCKET 2  | MASTER SCORE: 20.1
+────────────────────────────────────────────────────────────────────────────
+Volume (size):      235 grid points
+Chemical Profile:   Lipophilic/Hydrophobic
+Expected Ligands:   Hydrophobic/lipophilic ligands
+...
+```
+
+**What each field means:**
+
+- **RANK**: Position in the ranking (1 = best, highest score)
+- **POCKET**: Pocket identifier
+- **MASTER SCORE**: Combined score (0-100). Higher = better binding pocket
+- **Volume (size)**: Number of grid points in the pocket. Larger pockets can bind bigger ligands.
+- **Chemical Profile**: What kind of chemicals this pocket likes (Lipophilic, Anionic, Mixed)
+- **Expected Ligands**: Types of molecules that would fit in this pocket
+- **Nearby Residues**: Amino acids surrounding the pocket
+- **Composition**: How many hydrophobic, polar, positive, negative residues
+
+### 2. 1H8D_results.pdb - Colored Protein Structure
+
+This is a PDB file with the protein and pocket atoms:
+
+```bash
+# View it in any molecular viewer
+chimera 1H8D_results.pdb
+```
+
+The file contains:
+- The protein atoms (protein chains)
+- Pocket grid points as dummy atoms (chains A, B, C, etc. for each pocket)
+
+### 3. 1H8D_chimera.cmd - 3D Visualization Script
+
+Chimera automatically ran this script when analysis finished. It contains commands to display:
+
+```bash
+cat 1H8D_chimera.cmd
+```
+
+You'll see Chimera commands like:
+
+```
+open 1H8D_results.pdb
+surface
+surfrepr solid
+color light gray protein
+color blue :PKT.A z<4.0
+color green :PKT.B z<4.0
+...
+```
+
+These commands color different pockets different colors based on expected ligand size:
+- Blue = small molecules
+- Green = medium molecules
+- Red = large molecules
+
+### 4. 1H8D_pymol.pml - PyMOL Script
+
+Similar to the Chimera script but for PyMOL users:
+
+```bash
+# In PyMOL:
+run 1H8D_pymol.pml
+```
+
+---
+
+## Part 4: Interpreting Results (20 minutes)
+
+### Understanding the Master Score
+
+The Master Score combines three factors:
+
+```
+Master Score = (30% × Volume) + (35% × Hydrophobicity) + (35% × Conservation)
+```
+
+**Example for Pocket 1 (Score: 21.3):**
+- Volume: 572 points → Large pocket → Gets high volume score
+- Hydrophobicity: Mixed/Polar → Medium hydrophobicity score
+- Conservation: Unknown (database not found) → Gets default score
+
+**What the score means:**
+- Score > 20: Excellent binding pocket candidate
+- Score 15-20: Good binding pocket candidate
+- Score < 15: Possible but less likely
+
+### Interpreting Chemical Profile
+
+**Lipophilic/Hydrophobic** - This pocket likes fatty or oil-like molecules
+- Good for: Steroid drugs, retinoids, aromatic compounds
+- Example drugs: Many kinase inhibitors, lipid-binding proteins
+
+**Anionic (Acidic)** - This pocket has many positive charges
+- Good for: Negatively charged molecules
+- Example drugs: Anticoagulants like warfarin
+
+**Mixed/Polar** - This pocket can bind various types
+- Good for: Flexible drug design
+- Example drugs: Antibiotics, cofactor-binding sites
+
+### Comparing Pockets
+
+Look at the top 3 pockets:
+
+```bash
+head -100 1H8D_ranking.txt
+```
+
+**For 1H8D, you should see:**
+- Pocket 1: Large (572 pts), Mixed/Polar, Score 21.3 ← Best!
+- Pocket 2: Medium (235 pts), Lipophilic, Score 20.1
+- Pocket 3: Small (202 pts), Lipophilic, Score 19.9
+
+**Observations:**
+- Pocket 1 is the biggest and has the highest score
+- All top 3 have scores > 19 (very good)
+- Different chemical profiles (useful for different drugs)
+
+---
+
+## Part 5: Advanced Usage (Optional)
+
+### Using a Conservation Database
+
+If you have a sequence database, PocketFinder can add conservation scoring:
+
+```bash
+python3 pocket_finder.py 1H8D.pdb uniprot_sprot.fasta
+```
+
+This will:
+- Run Jackhmmer alignment against the database
+- Calculate conservation scores for nearby residues
+- Add conservation signal to Master Score
+- Take longer (1-2 minutes)
+
+Note: This feature is optional. The program works fine without a database.
+
+### Modifying Preset Parameters
+
+If you want to adjust detection sensitivity:
+
+```bash
+nano presets/medium_proteins.yaml
+```
+
+Change parameters like:
+- `min_points`: Minimum pocket size (lower = find more small pockets)
+- `max_points`: Maximum pocket size (higher = allow bigger pockets)
+- `eps_angstrom`: Clustering distance (affects how pockets are grouped)
+
+After saving, just run PocketFinder again:
+
+```bash
+python3 pocket_finder.py 1H8D.pdb
+```
+
+---
+
+## Part 6: Testing with Different Proteins
+
+### Test 1: Small Enzyme (HIV Protease - 1HPV)
+
+```bash
+wget https://files.rcsb.org/download/1HPV.pdb
+python3 pocket_finder.py 1HPV.pdb
+cat 1HPV_ranking.txt | head -30
+```
+
+**Expected:** 1-2 pockets, scores 15-20, runtime ~30 sec
+
+### Test 2: Medium Protein (Kinase - 1Z8I)
+
+```bash
+wget https://files.rcsb.org/download/1Z8I.pdb
+python3 pocket_finder.py 1Z8I.pdb
+cat 1Z8I_ranking.txt | head -30
+```
+
+**Expected:** 3-5 pockets, scores 15-20, runtime ~90 sec
+
+### Test 3: Large Complex (Hemoglobin - 2HHB)
+
+```bash
+wget https://files.rcsb.org/download/2HHB.pdb
+python3 pocket_finder.py 2HHB.pdb
+cat 2HHB_ranking.txt | head -30
+```
+
+**Expected:** 4-6 pockets, scores 12-18, runtime ~120 sec
+
+---
+
+## Part 7: Troubleshooting
+
+### Problem: "No module named 'yaml'"
+
+**Solution:** Install PyYAML
+```bash
+pip install pyyaml
+```
+
+### Problem: "Preset 'small_enzymes' not found"
+
+**Solution:** Check that presets directory exists
+```bash
+ls presets/
+# Should show: small_enzymes.yaml, medium_proteins.yaml, large_proteins.yaml
+```
+
+### Problem: "No pockets detected"
+
+**Possible reasons:**
+- Protein is too small (< 100 residues)
+- PDB file is corrupted
+- Presets are too strict for this protein
+
+**Solution:**
+```bash
+# Check protein size
+python3 -c "from bio_pockets import get_protein_structure; s, a = get_protein_structure('protein.pdb'); print(f'Atoms: {len(a)}')"
+
+# Try with a different protein
+```
+
+### Problem: Chimera doesn't open automatically
+
+**Possible reasons:**
+- Chimera not installed
+- Chimera not in PATH
+
+**Solution:**
+```bash
+# Install Chimera
+conda install -c bioconda chimera
+
+# Or open manually
+chimera 1H8D_chimera.cmd
+```
+
+### Problem: Very few pockets found
+
+**This is often normal!** Most proteins have 2-5 significant binding sites.
+
+If you expect more, you can:
+1. Try different protein (test on known drug targets)
+2. Adjust presets (lower `min_points` to find smaller pockets)
+3. Add conservation database (may help scoring)
+
+---
+
+## Part 8: Interpreting Visualization in Chimera
+
+When Chimera opens, you'll see:
+
+1. **Protein surface** - Gray wireframe showing protein shape
+2. **Colored pockets** - Blue, green, or red regions marking binding sites
+   - Blue: Small pockets (good for small drug molecules)
+   - Green: Medium pockets (good for standard pharmaceuticals)
+   - Red: Large pockets (good for peptides)
+
+### How to Explore in Chimera
+
+```
+# Rotate: Click + drag with mouse
+# Zoom: Scroll wheel
+# Pan: Middle-click + drag
+
+# In Chimera command line:
+Select :PKT  # Select all pocket atoms
+Delete selection  # Hide pockets for cleaner view
+Show :PKT  # Show pockets again
+```
+
+---
+
+## Part 9: Common Questions
+
+**Q: Why 7 pockets if I expected more?**
+A: The tool detects geometric cavities, not all possible binding sites. The minimum size (100 grid points) filters out noise. Most functional binding sites are in the top 3.
+
+**Q: Can the program miss binding sites?**
+A: Yes. If a binding site is very flat or unusual, it might not be detected. The program is optimized for standard pocket shapes.
+
+**Q: How long should analysis take?**
+A: 30-120 seconds depending on protein size. If it takes much longer, you may have:
+- A very large protein (> 1000 residues)
+- A slow computer
+- A corrupted PDB file
+
+**Q: Do I need the conservation database?**
+A: No, it's optional. The program works with just geometry and hydrophobicity. Conservation just adds another signal for scoring.
+
+**Q: Can I use this for ligand-specific prediction?**
+A: Partially. You can use the chemical profile (Lipophilic/Anionic/Mixed) to guide which pockets might bind your molecule. But the tool doesn't do full pharmacophore matching.
+
+---
+
+## Part 10: Next Steps
+
+Now that you know how to use PocketFinder:
+
+1. **Analyze your protein of interest**
+   ```bash
+   python3 pocket_finder.py your_protein.pdb
+   ```
+
+2. **Read THEORY.md for algorithm details**
+   - How pockets are detected
+   - Why Master Score combines these three factors
+   - How deduplication works
+
+3. **Check ANALYSIS.md for detailed case study**
+   - Deep dive into 1H8D results
+   - Validation against known binding sites
+   - Biological interpretation
+
+---
+
+## Summary
+
+You now know how to:
+✓ Install PocketFinder
+✓ Run the analysis on any protein
+✓ Interpret the output files
+✓ Understand the Master Score
+✓ Visualize results in Chimera
+✓ Troubleshoot common issues
+
+PocketFinder is ready to detect binding pockets in your proteins!
+
+---
+
+**Tutorial completed!** 
+
+For questions or issues, contact:
+- Cristina Torredemer (cristina.torredemer01@estudiant.upf.edu)
+- Ramona Walch (ramona.walch@estudiant.upf.edu)

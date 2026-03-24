@@ -1,0 +1,107 @@
+
+# PRESET: Large Proteins & Complexes
+ 
+# Target proteins: Kinase dimers, Antibodies, Large complexes
+# Protein size: 500-2000+ amino acids
+# Binding pocket size: 200-2000 grid points
+#
+# Strategy: PERMISSIVE = Detect all possible pockets
+# - Higher min_neighbors (deeper pockets)
+# - Higher max_points (large pockets allowed)
+# - Coarser grid spacing (faster for big structures)
+
+grid:
+  spacing_angstrom: 1.2
+  # Slightly coarser grid - speeds up calculation for large proteins
+  # Still maintains good resolution
+  
+  buffer_angstrom: 5.0
+
+geometry:
+  min_distance_angstrom: 2.0
+  max_distance_angstrom: 4.2
+  # Slightly more relaxed for large proteins
+  
+  surface_threshold_angstrom: 7.0
+  # Larger radius - can detect pockets in complex structures
+  
+  min_neighbors: 35
+  # Higher threshold to find deeper, more significant pockets
+  
+  max_neighbors: 100
+  # Higher limit - large proteins have crowded regions
+  
+  enclosure_check:
+    enabled: true
+    radii_angstrom: [4.0, 6.0, 8.0, 10.0]
+    # Additional radius for very deep pockets
+    min_enclosure_fraction: 0.35
+    # More lenient - large proteins have variable geometry
+
+clustering:
+  eps_angstrom: 1.6
+  # Slightly looser clustering to allow merging of complex shapes
+  
+  min_samples: 18
+  # Higher minimum for larger pockets
+  
+  min_points: 150
+  # Larger minimum - ignore noise, focus on significant pockets
+  
+  max_points: 2000
+  # **CRITICAL FOR LARGE PROTEINS**: max_points = 2000
+  # Allows detection of large ligand binding sites
+
+conservation:
+  enabled: true
+  jackhmmer_cpus: 4
+  # Can use more CPUs for MSA (larger proteins have slower searches)
+  
+  default_database: "/mnt/NFS_UPF/soft/databases/blastdat/uniprot_sprot.fasta"
+
+master_score:
+  weight_volume: 0.25
+  # 25%: Size less critical - some large pockets aren't binding sites
+  
+  weight_hydrophobicity: 0.40
+  # 40%: Hydrophobicity more important for ligand selectivity
+  
+  weight_conservation: 0.35
+  # 35%: Conservation strong signal
+  
+  volume:
+    min_points: 100
+    max_points: 1500
+    # Normalized for larger pocket sizes
+  
+  hydrophobicity:
+    min_value: -2.0
+    max_value: 2.0
+  
+  conservation:
+    min_value: 0.0
+    max_value: 1.0
+
+chemical_groups:
+  hydrophobic: ['ALA', 'VAL', 'ILE', 'LEU', 'MET', 'PHE', 'TYR', 'TRP', 'PRO']
+  polar: ['SER', 'THR', 'ASN', 'GLN', 'CYS']
+  positive: ['ARG', 'LYS', 'HIS']
+  negative: ['ASP', 'GLU']
+  
+  preference:
+    lipophilic_threshold: 0.45
+    # Slightly lower - large proteins can be more mixed
+    cationic_threshold: 0.35
+
+residue_assignment:
+  distance_threshold_angstrom: 7.0
+  # Larger radius - includes secondary shell residues
+
+logging:
+  level: "INFO"
+  format: "[%(levelname)s] %(message)s"
+  file: null
+
+visualization:
+  pymol_distance_threshold: 4.0
+  chimera_z_threshold: 4.0

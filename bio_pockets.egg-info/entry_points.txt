@@ -1,0 +1,2 @@
+[console_scripts]
+predict_pockets = pocket_finder:main
