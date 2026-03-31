@@ -1,405 +1,52 @@
-# PocketFinder: Automated Binding Pocket Detection and Ranking
+# PocketFinder
 
-**A Python-based structural bioinformatics tool for identifying, clustering, and ranking ligand-binding pockets in protein structures.**
+A Python pipeline for structure-based ligand binding site prediction.
 
-**Authors:** Cristina Torredemer & Ramona Walch 
-**Course:** Structural Bioinformatics (SBI), Universitat Pompeu Fabra 
-**Last Updated:** March 2026
+**Authors:** Cristina Torredemer & Ramona Walch · **Version:** 1.0
 
----
+------------------------------------------------------------------------
 
-## Overview
+## What is PocketFinder?
 
-PocketFinder is a computational pipeline that automatically detects potential ligand-binding sites in protein structures. The tool combines three complementary strategies:
+PocketFinder detects potential ligand-binding sites in protein structures. Given a PDB file, it scans the protein surface for cavities, clusters them into discrete pockets, and ranks them by druggability based on volume, hydrophobicity, and evolutionary conservation.
 
-1. **Geometric Analysis** - Ray-casting and enclosure checks to identify true cavities (not surface grooves)
-2. **Density-Based Clustering** - DBSCAN to group detected points into discrete pockets
-3. **Evolutionary Conservation** - HMMER/Jackhmmer MSA analysis to score functional relevance
+------------------------------------------------------------------------
 
-The final output is a ranked list of binding pockets with biochemical profiling, suitable for drug design workflows.
+## Quick Installation
 
----
-
-## Features
-
-- **Automated Structure Cleaning** - Removes water, ions, and ligands to expose the apo-protein
-- **3D Grid-Based Geometry** - Efficient detection using ray-casting 
-- **Clustering & Size Filtering** - DBSCAN with configurable parameters for different protein types
-- **Conservation Scoring** - Integrates Jackhmmer MSA data to identify functionally important pockets
-- **Master Score Ranking** - Weighted combination of volume, hydrophobicity, and conservation (0-100 scale)
-- **Chemical Profiling** - Classifies pockets as Lipophilic, Anionic, or Mixed/Polar
-- **Visualization Scripts** - Auto-generates PyMOL and Chimera scripts with color-coded pockets
-- **Automatic Chimera Launch** - Opens 3D visualization immediately after analysis
-
----
-
-## Installation
-
-### Requirements
-
-- Python
-- HMMER suite (specifically `jackhmmer`) - required for conservation analysis
-- Standard bioinformatics libraries (Biopython, NumPy, SciPy, scikit-learn)
-
-### Step 1: Clone or Download
-
-```bash
-git clone <repository-url>
-cd pocket_finder_final_überarbeitet
-```
-
-### Step 2: Install HMMER (if not already installed)
-
-**Option A: Via Conda (Recommended)**
-```bash
-conda install -c bioconda hmmer
-```
-
-**Option B: Via Apt (Debian/Ubuntu)**
-```bash
-sudo apt-get install hmmer
-```
-
-**Option C: Manual Download**
-Visit http://hmmer.org/ and follow installation instructions
-
-**Verify installation:**
-```bash
-jackhmmer -h
-# Should print: HMMER: profile hidden Markov models for biological sequence analysis
-```
-
-### Step 3: Install UCSF Chimera (for visualization)
-
-**Option A: Via Conda**
-```bash
-conda install -c bioconda chimera
-```
-
-**Option B: Manual**
-Download from https://www.cgl.ucsf.edu/chimera/download.html
-
-**Verify installation:**
-```bash
-chimera --help
-```
-
-### Step 4: Install PocketFinder
-
-```bash
-# Create virtual environment (optional but recommended)
-python3 -m venv pocket_env
-source pocket_env/bin/activate  # On Windows: pocket_env\Scripts\activate
-
-# Install package and dependencies
-pip install -e .
-
-# Verify
-python3 -c "import bio_pockets; print('✓ Installation successful')"
-```
-
----
-
-## Quick Start
-
-### Basic Usage
-
-```bash
-# Simple analysis with default parameters
-python3 pocket_finder.py protein.pdb
-
-# Analysis with custom conservation database
-python3 pocket_finder.py protein.pdb uniprot_sprot.fasta
-
-# Analysis with preset configuration
-python3 pocket_finder.py protein.pdb --preset small_enzymes
-```
-
-### Example: Analyzing 1H8D (Thrombin)
-
-```bash
-# Download the PDB file
-wget https://files.rcsb.org/download/1H8D.pdb
-
-# Run analysis
-python3 pocket_finder.py 1H8D.pdb
-
-# Expected output:
-# - 1H8D_ranking.txt (detailed pocket report)
-# - 1H8D_results.pdb (colored pockets)
-# - 1H8D_chimera.cmd (visualization script)
-# - Chimera window opens automatically with 3D visualization
-```
-
----
-
-## Output Files
-
-After running the pipeline, you'll find:
-
-### 1. **{protein}_ranking.txt** - Main Results
-Detailed ranked list of detected pockets with:
-- Master Score (0-100)
-- Volume (in grid points)
-- Chemical Profile (Lipophilic/Anionic/Mixed)
-- Expected Ligand Types
-- Nearby Residues
-- Composition breakdown
-
-**Example:**
-```
-RANK 1 (***) | POCKET 1  | MASTER SCORE: 21.3
-Volume (size):      572 grid points
-Chemical Profile:   Mixed/Polar
-Expected Ligands:   Diverse ligands with mixed character: antibiotics, 
-                    cofactors, nucleotides, peptides, polar pharmaceuticals
-Nearby Residues:    ALA183, ARG173, ASP186, ASP189, ... (44 total)
-Composition:        11 hydrophobic, 9 polar, 8 positive, 9 negative
-```
-
-### 2. **{protein}_results.pdb** - Colored Pockets
-Modified PDB file with pocket atoms (dummy P atoms) colored by chain:
-- Chain A = Pocket 1
-- Chain B = Pocket 2
-- etc.
-
-Useful for visualization in any molecular viewer.
-
-### 3. **{protein}_chimera.cmd** - Chimera Script
-Pre-generated commands to visualize in UCSF Chimera with:
-- Protein surface in light gray
-- Pockets colored by size (blue=small, green=medium, red=large)
-- Automatic optimal viewing angle
-
-### 4. **{protein}_pymol.pml** - PyMOL Script
-Equivalent commands for PyMOL users.
-
-### 5. **{protein}_cleaned.pdb** - Cleaned Structure
-Protein structure with water, ions, and ligands removed. Intermediate file useful for debugging.
-
-### 6. **{protein}_query.fasta** & **{protein}_alignment.sto**
-Sequence and MSA files from Jackhmmer search. Used internally for conservation scoring.
-
----
-
-## Understanding the Results
-
-### Master Score (0-100)
-
-The Master Score is a weighted combination of three signals:
-
-```
-Master Score = (30% × Volume) + (35% × Hydrophobicity) + (35% × Conservation)
-```
-
-**What each component means:**
-
-- **Volume (30%)**: Larger pockets can accommodate bigger ligands. Very small pockets are less likely to be druggable.
-  - Score = 0 if < 50 points
-  - Score = 100 if > 500 points
-
-- **Hydrophobicity (35%)**: Most ligands are hydrophobic. Calculated using Kyte-Doolittle scale of nearby residues.
-  - Score = 0 if average KD < -2.0
-  - Score = 100 if average KD > +2.0
-
-- **Conservation (35%)**: Evolutionarily conserved pockets are typically functional. Calculated from Jackhmmer MSA.
-  - Score = 0 if < 0% of sequences conserved
-  - Score = 100 if > 100% sequences conserved
-
-**Interpretation:**
-- Score > 20: High confidence binding pocket, likely druggable
-- Score 15-20: Medium confidence, possible drug target
-- Score < 15: Lower confidence, may be functional but less typical
-
-### Chemical Profile
-
-Pockets are classified based on residue composition:
-
-1. **Lipophilic/Hydrophobic** (> 50% hydrophobic residues)
-   - Expected ligands: Fatty acids, steroids, retinoids, aromatic compounds
-   - Example: Kinase ATP-binding pockets
-
-2. **Anionic (Acidic)** (more positive than negative residues)
-   - Expected ligands: Positively charged inhibitors, arginine-rich peptides, basic amino acids
-   - Example: Some protease binding sites
-
-3. **Mixed/Polar** (everything else)
-   - Expected ligands: Antibiotics, cofactors, nucleotides, peptides, polar pharmaceuticals
-   - Example: NAD+-binding pockets, serine protease binding sites
-
----
-
-## Color Scheme in Chimera
-
-When you open the visualization in Chimera, pockets are colored by ligand type:
-
-```
-🔵 BLUE   = SMALL ligands (< 150 grid points)
-           Examples: Aspirin, Warfarin, small molecule drugs (~50-300 Da)
-
-🟢 GREEN  = MEDIUM ligands (150-400 grid points)
-           Examples: Most FDA-approved drugs (~300-800 Da)
-
-🔴 RED    = LARGE ligands (> 400 grid points)
-           Examples: Peptide inhibitors, antibody fragments, polyketides (> 800 Da)
-```
-
-The colored surface shows the protein regions influenced by each pocket.
-
----
-
-## Configuration & Presets
-
-PocketFinder includes preset configurations optimized for different protein types:
-
-### Available Presets
-
-**small_enzymes.yaml** - For small enzymes (150-400 aa)
-- Tighter geometry thresholds
-- Smaller max pocket size (400 points)
-- Examples: Thrombin, Chymotrypsin, Trypsin
-
-**medium_proteins.yaml** - Standard proteins (300-600 aa)
-- Balanced parameters
-- Max pocket size 800 points
-- Examples: Kinases, most drug targets
-
-**large_proteins.yaml** - Large complexes (500-2000+ aa)
-- Permissive geometry
-- Larger max pocket size (2000 points)
-- Examples: Kinase dimers, antibody fragments
-
----
-
-## Technical Details
-
-### Algorithm Overview
-
-**Phase 1: Geometric Detection**
-1. Generate uniform 3D grid around protein with configurable spacing (default 1.0 Å)
-2. Filter grid points:
-   - Min distance check (no atoms within 2.0 Å)
-   - Surface proximity (must be near protein, < 4.0 Å from nearest atom)
-   - Density check (neighborhood must have 30-80 atoms)
-   - **Enclosure check** (point must be surrounded by atoms in ≥ 40% of 26 directions)
-
-**Phase 2: Clustering**
-- Apply DBSCAN (eps=1.5 Å, min_samples=15) to group valid grid points
-- Filter clusters by size (100-1000 grid points)
-- Rank by size (largest = pocket ID 1, etc.)
-
-**Phase 3: Conservation Profiling**
-- Extract protein sequence from PDB
-- Run Jackhmmer against provided database (default: uniprot_sprot.fasta)
-- Calculate residue-wise conservation from resulting MSA
-- Assign conservation scores to pocket-adjacent residues
-
-**Phase 4: Ranking & Profiling**
-- Calculate Master Score for each pocket
-- Classify chemical profile (Lipophilic/Anionic/Mixed)
-- Assign nearby residues (within 4.5 Å)
-- Generate human-readable report
-
-### Key Parameters
-
-| Parameter | Value | Rationale |
-|-----------|-------|-----------|
-| Grid spacing | 1.0 Å | Balance between resolution and speed |
-| Min atom distance | 2.0 Å | Exclude crowded regions (atoms overlap at ~1.7 Å) |
-| Surface proximity | 4.0 Å | Includes van der Waals + hydration shell |
-| Density threshold | 6.5 Å | Window for counting neighboring atoms |
-| Min enclosure | 40% | Must be surrounded in ≥ 40% of 26 directions |
-| DBSCAN eps | 1.5 Å | Appropriate for ~1 Å grid spacing |
-| Min pocket size | 100 points | Avoids noise; still detects small pockets |
-
----
-
-
-## Troubleshooting
-
-### Problem: "No module named 'jackhmmer'"
-**Solution:** Install HMMER
-```bash
-conda install -c bioconda hmmer
-which jackhmmer  # Verify installation
-```
-
-### Problem: "Chimera executable not found"
-**Solution:** Install Chimera
-```bash
-conda install -c bioconda chimera
-# or manually: https://www.cgl.ucsf.edu/chimera/download.html
-which chimera  # Verify
-```
-
-### Problem: "No module named 'bio_pockets'"
-**Solution:** Reinstall package
-```bash
-pip uninstall -y bio_pockets
-rm -rf build/ *.egg-info/ __pycache__/
+``` bash
+mamba create -n pocketfinder python=3.11
+mamba activate pocketfinder
+mamba install -c bioconda hmmer   # optional, for conservation scoring
+cd path/to/project_directory/
 pip install -e .
 ```
 
-### Problem: 0 pockets found
-**Possible causes:**
-- Protein is too small (< 100 residues)
-- Parameters too strict for protein size → try different preset
-- PDB file is corrupted → download fresh copy
+------------------------------------------------------------------------
 
-**Debug:**
-```bash
-# Check protein size
-python3 -c "from bio_pockets import get_protein_structure; s, a = get_protein_structure('protein.pdb'); print(f'Atoms: {len(a)}')"
+## Usage
+
+``` bash
+# Basic run — automatically uses the university server database if available
+predict_pockets protein.pdb
+
+# With a custom database for conservation scoring
+predict_pockets protein.pdb /path/to/uniprot_sprot.fasta
 ```
 
-### Problem: Only a few pockets found (expected > 10)
-- This is **normal** - many detected points don't form valid pockets
-- Most proteins have 2-5 significant binding sites
-- Size filtering removes noise (min 100 points default)
+Results are saved to `result/{PROTEIN_ID}/` and include a ranked pocket list, a combined PDB structure, and ready-to-use visualization scripts for UCSF Chimera and PyMOL.
 
-### Problem: Chimera shows overlapping colors
-This happens when pockets are very close (< 8 Å apart). Consider:
-- Using z<2.5 instead of z<4.0 in data.py (tighter surface definition)
-- Visualizing only top 5 pockets
-- Running separate analysis on individual pocket region
+------------------------------------------------------------------------
 
----
+## Documentation
 
-## Limitations
+For a full walkthrough — including how to interpret results, advanced configuration, and visualization — see the **Tutorial**.
 
-1. **Parameter Sensitivity** - Results depend on grid spacing, DBSCAN parameters, and distance thresholds. We provide presets, but may need tuning for unusual proteins.
+------------------------------------------------------------------------
 
-2. **Conservation Database Dependent** - Jackhmmer results depend on database quality and size. UniProt-SwissProt is good for well-characterized proteins but sparse for novel sequences.
+## Contact
 
-3. **No Ligand-Specific Pharmacophores** - Tool detects geometric pockets, not specific binding requirements. A pocket may be "detected" but not bind your molecule of interest.
-
-4. **Symmetric Complexes** - Multi-chain proteins may report duplicate pockets for symmetry-equivalent binding sites. Manual deduplication may be needed.
-
-5. **Small Proteins** - Proteins < 100 residues often have insufficient grid resolution. Consider increasing grid spacing if needed.
-
----
-
-## Citation
-
-If you use PocketFinder in your research, please cite:
-
-```
-Torredemer, C. & Walch, R. (2026). 
-PocketFinder: Automated Binding Pocket Detection using Geometric and 
-Evolutionary Approaches. 
-Structural Bioinformatics Course Project, Universitat Pompeu Fabra.
-```
-
----
-
-## Contact & Support
-
-For questions or bug reports, contact:
-- Cristina Torredemer (cristina.torredemer01@estudiant.upf.edu)
-- Ramona Walch (ramona.walch@estudiant.upf.edu)
-
----
-
-**Last Updated:** March 2026  
-**Version:** 1.0  
-**Status:** Stable (SBI Course Version)
+| Name | Email |
+|----|----|
+| Cristina Torredemer | [cristina.torredemer01\@estudiant.upf.edu](mailto:cristina.torredemer01@estudiant.upf.edu){.email} |
+| Ramona Walch | [ramona.walch\@estudiant.upf.edu](mailto:ramona.walch@estudiant.upf.edu){.email} |
