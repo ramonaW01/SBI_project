@@ -49,7 +49,7 @@ Step 3: Install HMMER via bioconda
 
 Step 4: Navigate to the project directory
 
-    cd path/to/pocket_finder/
+    cd path/to/project_directory/
 
     The directory should contain: pocket_finder.py, pyproject.toml,
     config.yaml, the bio_pockets/ folder, and the presets/ folder.
