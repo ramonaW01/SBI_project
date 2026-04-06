@@ -19,27 +19,7 @@ dependencies = [
 ]
 
 [project.scripts]
-# This creates a magic command 'predict_pockets' that runs your main script
 predict_pockets = "pocket_finder:main"
-
-# Project_Folder/
-#├── pyproject.toml
-#├── README.md             <-- Your Tutorial & Theory
-#├── pocket_finder.py      <-- Your main script
-#└── myproject/            <-- The folder with your modules
-#    ├── __init__.py
-#    ├── data.py
-#    ├── utils.py
-#    ├── config_manager.py
-#    ├── consensus_analyzer.py
-#    └── analysis.py
-
-
-# For this .toml file to work, ensure your files are organized like this:
-
-    #Top Level: pyproject.toml, README.md, pocket_finder.py.
-
-    #Subfolder myproject/: __init__.py, data.py, utils.py, config_manager.py, consensus_analyzer.py, analysis.py.
 
 [tool.setuptools.packages.find]
 include = ["bio_pockets*"] # it tells setuptools to only look inside bio_pockets/ and ignore presets/
